@@ -1,6 +1,7 @@
+import random
 import time
 
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage
 
 
 class TestElements:
@@ -46,4 +47,28 @@ class TestRadioButton:
         radio_button_page.open()
         no_button_clickable = radio_button_page.radio_button_no_status()
         assert no_button_clickable == 'No'
+
+
+class TestWebTable:
+    def test_web_table_add_person(self, driver):
+        web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+        web_table_page.open()
+        new_person = web_table_page.add_new_person(count=7)
+        result_table = web_table_page.check_new_added_person()
+        for raw in new_person:
+            assert raw in result_table, "entered record has not been added to the table"
+
+    def test_web_table_search_person(self, driver):
+        web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+        web_table_page.open()
+        keyword = web_table_page.add_new_person(count=1)[0][random.randint(0, 5)]
+        result_table = web_table_page.check_new_added_person()
+        for raw in result_table:
+            assert raw in result_table, "entered record has not been added to the table"
+        web_table_page.search_person(keyword=keyword)
+        table_result = web_table_page.check_search_person()
+        print(keyword)
+        print(table_result)
+        assert keyword in table_result, "person was not found in the table"
+
 
