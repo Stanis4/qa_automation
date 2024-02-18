@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from generator.generator import generated_person
 from pages.base_page import BasePage
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonLocators, \
-    WebTablePageLocators
+    WebTablePageLocators, ButtonsPageLocators
 
 
 class TextBoxPage(BasePage):
@@ -185,4 +185,27 @@ class WebTablePage(BasePage):
     def go_to_previous_table(self):
         self.element_is_clickable(self.locators.PREVIOUS_BUTTON).click()
 
+
+class ButtonsPage(BasePage):
+    locators = ButtonsPageLocators()
+
+    def click(self):
+        click_button = self.element_is_visible(self.locators.CLICK_BUTTON)
+        click_button.click()
+        return self.check_click_result(self.locators.CLICK_BUTTON_MESSAGE)
+
+    def double_click(self):
+        double_click_button = self.element_is_visible(self.locators.DOUBLE_CLICK_BUTTON)
+        self.go_to_element(double_click_button)
+        self.action_double_click(double_click_button)
+        return self.check_click_result(self.locators.DOUBLE_CLICK_BUTTON_MESSAGE)
+
+    def right_click(self):
+        right_click_button = self.element_is_visible(self.locators.RIGHT_CLICK_BUTTON)
+        self.go_to_element(right_click_button)
+        self.action_right_click(right_click_button)
+        return self.check_click_result(self.locators.RIGHT_CLICK_BUTTON_MESSAGE)
+
+    def check_click_result(self, element):
+        return self.element_is_present(element).text
 
