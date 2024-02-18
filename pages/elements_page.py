@@ -1,6 +1,8 @@
 import random
 import time
 
+from selenium.webdriver.common.by import By
+
 from generator.generator import generated_person
 from pages.base_page import BasePage
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonLocators, \
@@ -105,19 +107,82 @@ class WebTablePage(BasePage):
             self.element_is_visible(self.locators.SUBMIT).click()
             count -= 1
             persons.append([firstname, lastname, str(age), email, str(salary), department])
+        print(persons)
         return persons
 
     def check_new_added_person(self):
-        people_list = self.elements_are_present(self.locators.FULL_PEOPLE_LIST)
+        people_list = self.elements_are_visible(self.locators.FULL_PEOPLE_LIST)
         data = []
         for item in people_list:
             data.append(item.text.splitlines())
         return data
 
     def search_person(self, keyword):
-        self.element_is_visible(self.locators.SEARCH_BOX).send_keys(keyword)
+        search_box = self.element_is_visible(self.locators.SEARCH_BOX)
+        search_box.clear()
+        search_box.send_keys(keyword)
 
     def check_search_person(self):
-        delete_button = self.element_is_present(self.locators.DELETE_BUTTON)
-        row = delete_button.find_element("xpath", self.locators.PARENT_RAW)
+        delete_button = self.element_is_visible(self.locators.DELETE_BUTTON)
+        self.go_to_element(delete_button)
+        row = delete_button.find_element("xpath", self.locators.LAST_ROW)
         return row.text.splitlines()
+
+    def update_person_info(self):
+        person_info = next(generated_person())
+        parameters = {person_info.first_name: self.locators.FIRSTNAME_INPUT,
+                      person_info.email: self.locators.EMAIL_INPUT,
+                      str(person_info.age): self.locators.AGE_INPUT,
+                      str(person_info.salary): self.locators.SALARY_INPUT,
+                      person_info.department: self.locators.DEPARTMENT_INPUT}
+
+        random_parameter = random.choice(list(parameters.keys()))
+        edit_button = self.element_is_visible(self.locators.EDIT_BUTTON)
+        self.go_to_element(edit_button)
+        edit_button.click()
+        self.element_is_visible(parameters[random_parameter]).clear()
+        self.element_is_visible(parameters[random_parameter]).send_keys(str(random_parameter))
+        self.element_is_visible(self.locators.SUBMIT).click()
+        return str(random_parameter)
+
+    def delete_person(self):
+        delete_button = self.element_is_visible(self.locators.DELETE_BUTTON)
+        self.go_to_element(delete_button)
+        delete_button.click()
+
+    def check_deleted(self):
+        return self.element_is_present(self.locators.NO_ROWS_FOUND).text
+
+    def select_number_of_rows(self):
+        count = [5, 10, 20, 25, 50, 100]
+        data = []
+        for x in count:
+            row_number_button = self.element_is_visible(self.locators.ROWS_NUMBER)
+            self.go_to_element(row_number_button)
+            row_number_button.click()
+            self.element_is_visible((By.CSS_SELECTOR, f"option[value='{x}']")).click()
+            data.append(self.check_rows_number())
+        return data
+
+    def check_rows_number(self):
+        number_of_rows = self.elements_are_present(self.locators.FULL_PEOPLE_LIST)
+        return len(number_of_rows)
+
+    def check_filled_rows_number(self):
+        number_of_filled_rows = self.elements_are_present((By.XPATH, self.locators.FILLED_ROW))
+        return len(number_of_filled_rows)
+
+    def change_number_of_rows(self, number):
+        row_number_button = self.element_is_visible(self.locators.ROWS_NUMBER)
+        self.go_to_element(row_number_button)
+        row_number_button.click()
+        self.element_is_visible((By.CSS_SELECTOR, f"option[value='{number}']")).click()
+        return self.check_rows_number()
+
+    def go_to_next_table(self):
+        self.element_is_clickable(self.locators.NEXT_BUTTON).click()
+
+    def go_to_previous_table(self):
+        self.element_is_clickable(self.locators.PREVIOUS_BUTTON).click()
+
+

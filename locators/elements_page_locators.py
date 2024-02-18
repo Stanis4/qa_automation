@@ -48,3 +48,12 @@ class WebTablePageLocators:
     SEARCH_BOX = (By.CSS_SELECTOR, "input[id='searchBox']")
     DELETE_BUTTON = (By.CSS_SELECTOR, "span[title='Delete']")
     PARENT_RAW = (".//ancestor::div[@class='rt-tr-group']")
+    LAST_ROW = ("//div[@class='rt-tr-group'][string-length() > 8][last()]")  # last not empty row
+    FILLED_ROW = ("//div[@class='rt-tr-group'][string-length() > 8]")
+    NO_ROWS_FOUND = (By.CSS_SELECTOR, "div[class='rt-noData']")
+    ROWS_NUMBER = (By.CSS_SELECTOR, "select[aria-label='rows per page']")
+    PREVIOUS_BUTTON = (By.CSS_SELECTOR, "div[class=-previous]")
+    NEXT_BUTTON = (By.CSS_SELECTOR, "div[class=-next]")
+
+    # update
+    EDIT_BUTTON = (By.CSS_SELECTOR, "span[title='Edit']")
