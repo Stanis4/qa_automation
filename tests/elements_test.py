@@ -1,7 +1,8 @@
 import random
 import time
 
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage
+from locators.elements_page_locators import LinksPageLocators
 
 
 class TestElements:
@@ -127,6 +128,39 @@ class TestButtons:
         assert double_click == "You have done a double click", "Double click action failed"
         assert right_click == "You have done a right click", "Right click action failed"
         assert click == "You have done a dynamic click", "Dynamic click action failed"
+
+
+class TestLinksPage:
+    def test_valid_link(self, driver):
+        links_page = LinksPage(driver, 'https://demoqa.com/links')
+        links_page.open()
+        href_link, current_url = links_page.check_new_tab_simple_link()
+        assert href_link == current_url, "the link is broken"
+
+    def test_broken_link(self, driver):
+        links_page = LinksPage(driver, 'https://demoqa.com/links')
+        links_page.open()
+        response_code = links_page.check_broken_link("https://demoqa.com/bad-request")
+        assert response_code == 400, "the link is valid"
+
+    def test_status_codes(self, driver):
+        links_page = LinksPage(driver, 'https://demoqa.com/links')
+        links_page.open()
+        bad_link = links_page.check_broken_link("https://demoqa.com/bad-request")
+        created_link = links_page.check_broken_link("https://demoqa.com/created")
+        no_content_link = links_page.check_broken_link("https://demoqa.com/no-content")
+        moved_link = links_page.check_broken_link("https://demoqa.com/moved")
+        unauthorized_link = links_page.check_broken_link("https://demoqa.com/unauthorized")
+        forbidden_link = links_page.check_broken_link("https://demoqa.com/forbidden")
+        not_found_link = links_page.check_broken_link("https://demoqa.com/invalid-url")
+        assert bad_link == 400
+        assert created_link == 201
+        assert no_content_link == 204
+        assert moved_link == 301
+        assert unauthorized_link == 401
+        assert forbidden_link == 403
+        assert not_found_link == 404
+
 
 
 

@@ -1,12 +1,13 @@
 import random
 import time
 
+import requests
 from selenium.webdriver.common.by import By
 
 from generator.generator import generated_person
 from pages.base_page import BasePage
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonLocators, \
-    WebTablePageLocators, ButtonsPageLocators
+    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators
 
 
 class TextBoxPage(BasePage):
@@ -208,4 +209,26 @@ class ButtonsPage(BasePage):
 
     def check_click_result(self, element):
         return self.element_is_present(element).text
+
+
+class LinksPage(BasePage):
+    locators = LinksPageLocators()
+
+    def check_new_tab_simple_link(self):
+        try:
+            simple_link = self.element_is_visible(self.locators.SIMPLE_LINK)
+            link_href = simple_link.get_attribute('href')
+            request = requests.get(f'{link_href}')
+            url = self.driver.current_url
+            if request.status_code == 200:
+                simple_link.click()
+                self.driver.switch_to.window(self.driver.window_handles[1])
+                url = self.driver.current_url
+            return link_href, url
+        except Exception as e:
+            return f"An error occurred: {str(e)}"
+
+    def check_broken_link(self, url):
+        request = requests.get(url)
+        return request.status_code
 
