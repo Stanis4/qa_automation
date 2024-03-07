@@ -1,13 +1,15 @@
+import base64
+import os
 import random
 import time
 
 import requests
 from selenium.webdriver.common.by import By
 
-from generator.generator import generated_person
+from generator.generator import generated_person, generated_file
 from pages.base_page import BasePage
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonLocators, \
-    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators
+    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators
 
 
 class TextBoxPage(BasePage):
@@ -228,7 +230,29 @@ class LinksPage(BasePage):
         except Exception as e:
             return f"An error occurred: {str(e)}"
 
-    def check_broken_link(self, url):
+    def check_link(self, url):
         request = requests.get(url)
         return request.status_code
 
+
+class UploadAndDownloadPage(BasePage):
+    locators = UploadAndDownloadPageLocators()
+
+    def upload_file(self):
+        file_name, path = generated_file()
+        self.element_is_present(self.locators.UPLOAD_BUTTON).send_keys(path)
+        os.remove(path)
+        text = self.element_is_present(self.locators.UPLOADED_RESULT).text
+        return file_name.split("\\")[-1], text.split("\\")[-1]
+
+    def download_file(self):
+        current_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+        link = self.element_is_visible(self.locators.DOWNLOAD_BUTTON).get_attribute('href')
+        link_b = base64.b64decode(link)
+        path_name_file = os.path.join(current_dir, f'filetest_{random.randint(1, 999)}.jpg')
+        with open(path_name_file, 'wb+') as f:
+            offset = link_b.find(b'\xff\xd8')
+            f.write(link_b[offset:])
+            check_file = os.path.exists(path_name_file)
+        os.remove(path_name_file)
+        return check_file

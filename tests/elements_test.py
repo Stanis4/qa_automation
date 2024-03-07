@@ -1,7 +1,8 @@
 import random
 import time
 
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage, \
+    UploadAndDownloadPage
 from locators.elements_page_locators import LinksPageLocators
 
 
@@ -137,22 +138,16 @@ class TestLinksPage:
         href_link, current_url = links_page.check_new_tab_simple_link()
         assert href_link == current_url, "the link is broken"
 
-    def test_broken_link(self, driver):
-        links_page = LinksPage(driver, 'https://demoqa.com/links')
-        links_page.open()
-        response_code = links_page.check_broken_link("https://demoqa.com/bad-request")
-        assert response_code == 400, "the link is valid"
-
     def test_status_codes(self, driver):
         links_page = LinksPage(driver, 'https://demoqa.com/links')
         links_page.open()
-        bad_link = links_page.check_broken_link("https://demoqa.com/bad-request")
-        created_link = links_page.check_broken_link("https://demoqa.com/created")
-        no_content_link = links_page.check_broken_link("https://demoqa.com/no-content")
-        moved_link = links_page.check_broken_link("https://demoqa.com/moved")
-        unauthorized_link = links_page.check_broken_link("https://demoqa.com/unauthorized")
-        forbidden_link = links_page.check_broken_link("https://demoqa.com/forbidden")
-        not_found_link = links_page.check_broken_link("https://demoqa.com/invalid-url")
+        bad_link = links_page.check_link("https://demoqa.com/bad-request")
+        created_link = links_page.check_link("https://demoqa.com/created")
+        no_content_link = links_page.check_link("https://demoqa.com/no-content")
+        moved_link = links_page.check_link("https://demoqa.com/moved")
+        unauthorized_link = links_page.check_link("https://demoqa.com/unauthorized")
+        forbidden_link = links_page.check_link("https://demoqa.com/forbidden")
+        not_found_link = links_page.check_link("https://demoqa.com/invalid-url")
         assert bad_link == 400
         assert created_link == 201
         assert no_content_link == 204
@@ -162,8 +157,16 @@ class TestLinksPage:
         assert not_found_link == 404
 
 
+class TestUploadAndDownload:
 
+    def test_upload_file(self, driver):
+        upload_download_page = UploadAndDownloadPage(driver, 'https://demoqa.com/upload-download')
+        upload_download_page.open()
+        file_name, result = upload_download_page.upload_file()
+        assert file_name == result, "file was not uploaded"
 
-
-
-
+    def test_download_file(self, driver):
+        upload_download_page = UploadAndDownloadPage(driver, 'https://demoqa.com/upload-download')
+        upload_download_page.open()
+        check = upload_download_page.download_file()
+        assert check is True, "file was not downloaded"
