@@ -9,7 +9,8 @@ from selenium.webdriver.common.by import By
 from generator.generator import generated_person, generated_file
 from pages.base_page import BasePage
 from locators.elements_page_locators import TextBoxPageLocators, CheckBoxPageLocators, RadioButtonLocators, \
-    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators
+    WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators, \
+    DynamicPropertiesPageLocators
 
 
 class TextBoxPage(BasePage):
@@ -256,3 +257,33 @@ class UploadAndDownloadPage(BasePage):
             check_file = os.path.exists(path_name_file)
         os.remove(path_name_file)
         return check_file
+
+
+class DynamicPropertiesPage(BasePage):
+    locators = DynamicPropertiesPageLocators()
+
+    def check_button_is_enabled(self):
+        try:
+            self.element_is_clickable(self.locators.ENABLE_BUTTON)
+        except TimeoutError:
+            return False
+        return True
+
+    def check_button_is_disabled(self):
+        try:
+            enable_btn = self.element_is_visible(self.locators.ENABLE_BUTTON, 0)
+        except TimeoutError:
+            return False
+        else:
+            return not enable_btn.get_property('disabled')
+
+    def check_changed_color(self):
+        try:
+            color_button = self.element_is_present(self.locators.COLOR_CHANGE_BUTTON)
+            color_button_before = color_button.value_of_css_property("color")
+            assert self.element_is_present(self.locators.VISIBLE_AFTER_FIVE_SEC_BUTTON)
+            color_button_after = color_button.value_of_css_property("color")
+        except TimeoutError:
+            return None
+        else:
+            return color_button_before, color_button_after
