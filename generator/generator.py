@@ -19,6 +19,7 @@ def generated_person():
         email=faker_en.email(),
         current_address=faker_en.street_address(),
         permanent_address=faker_en.street_address(),
+        mobile=faker_en.msisdn(),
     )
 
 
