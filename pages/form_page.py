@@ -19,6 +19,8 @@ class FormPage(BasePage):
         self.element_is_visible(self.locators.EMAIL).send_keys(person.email)
         self.element_is_visible(self.locators.GENDER).click()
         self.element_is_visible(self.locators.MOBILE).send_keys(person.mobile)
+        # self.element_is_present(self.locators.DATE_OF_BIRTH).clear()
+        # self.element_is_visible(self.locators.DATE_OF_BIRTH).send_keys(person.date_of_birth)
         self.element_is_visible(self.locators.SUBJECTS).send_keys('Maths')
         self.element_is_visible(self.locators.SUBJECTS).send_keys(Keys.RETURN)
         self.element_is_visible(self.locators.HOBBIES).click()

@@ -48,5 +48,18 @@ class BasePage:
         self.driver.execute_script("document.getElementsByTagName('footer')[0].remove()")
         self.driver.execute_script("document.getElementById('close-fixedban').remove()")
 
+    def switch_to_alert(self, timeout=6, is_accepted=True, data=None):
+        alert = wait(self.driver, timeout).until(EC.alert_is_present())
+        try:
+            if data:
+                alert.send_keys(data)
+            alert_text = alert.text
+        finally:
+            if is_accepted:
+                alert.accept()
+            else:
+                alert.dismiss()
+        return alert_text
 
-
+    def switch_to_frame(self, frame_locator, timeout=5):
+        wait(self.driver, timeout).until(EC.frame_to_be_available_and_switch_to_it(frame_locator))

@@ -20,6 +20,7 @@ def generated_person():
         current_address=faker_en.street_address(),
         permanent_address=faker_en.street_address(),
         mobile=faker_en.msisdn(),
+        date_of_birth=faker_en.date_between(start_date='-30y', end_date='today').strftime('%d %B %Y'),
     )
 
 
