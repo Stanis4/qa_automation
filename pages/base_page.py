@@ -25,6 +25,9 @@ class BasePage:
     def elements_are_present(self, locator, timeout=5):
         return wait(self.driver, timeout).until(EC.presence_of_all_elements_located(locator))
 
+    def elements_are_not_present(self, locator, timeout=5):
+        return wait(self.driver, timeout).until_not(EC.presence_of_all_elements_located(locator))
+
     def element_is_not_visible(self, locator, timeout=5):
         return wait(self.driver, timeout).until(EC.invisibility_of_element_located(locator))
 
