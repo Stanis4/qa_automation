@@ -1,9 +1,11 @@
 import random
+import time
 
 from selenium.webdriver import Keys
 
 from generator.generator import generated_color
-from locators.widgets_page_locators import AccordianPageLocators, AutocompletePageLocators
+from locators.widgets_page_locators import AccordianPageLocators, AutocompletePageLocators, SliderPageLocators, \
+    ProgressBarPageLocators
 from pages.base_page import BasePage
 
 
@@ -71,4 +73,42 @@ class AutocompletePage(BasePage):
     def check_single_color(self):
         color = self.element_is_visible(self.locators.SINGLE_NAME_VALUE).text
         return color
+
+
+class SliderPage(BasePage):
+    locators = SliderPageLocators()
+
+    def change_slider_value(self):
+        value_before = self.element_is_visible(self.locators.SLIDER).get_attribute('value')
+        text_value_before = self.element_is_visible(self.locators.SLIDER_TEXT_VALUE).get_attribute('value')
+        slider_input = self.element_is_visible(self.locators.SLIDER)
+        random_value = random.randint(-255, 256)
+        if value_before == random_value:
+            random_value += 1
+        self.action_drag_and_drop_by_offset(slider_input, random_value, 0)
+        value_after = self.element_is_visible(self.locators.SLIDER).get_attribute('value')
+        text_value_after = self.element_is_visible(self.locators.SLIDER_TEXT_VALUE).get_attribute('value')
+        return value_before, value_after, text_value_before, text_value_after
+
+
+class ProgressBarPage(BasePage):
+    locators = ProgressBarPageLocators()
+
+    def change_progress_bar_value(self):
+        value_before = self.element_is_present(self.locators.PROGRESS_BAR_VALUE).get_attribute('style')
+        start_stop_button = self.element_is_visible(self.locators.START_STOP_BUTTON)
+        start_stop_button.click()
+        time.sleep(random.randint(1, 7))
+        start_stop_button.click()
+        value_after = self.element_is_present(self.locators.PROGRESS_BAR_VALUE).get_attribute('style')
+        return value_before, value_after
+
+    def complete_progress_bar(self):
+        start_stop_button = self.element_is_visible(self.locators.START_STOP_BUTTON)
+        start_stop_button.click()
+        completed_progress_bar = self.element_is_present(self.locators.PROGRESS_BAR_COMPLETED, timeout=15).text
+        reset_button = self.element_is_visible(self.locators.RESET_BUTTON)
+        reset_button.click()
+        reset_value = self.element_is_present(self.locators.PROGRESS_BAR_VALUE).text
+        return completed_progress_bar, reset_value
 

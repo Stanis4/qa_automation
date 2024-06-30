@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from pages.widgets_page import AccordianPage, AutocompletePage
+from pages.widgets_page import AccordianPage, AutocompletePage, SliderPage, ProgressBarPage
 
 
 class TestAccordianPage:
@@ -49,3 +49,29 @@ class TestAutocompletePage:
         color = autocomplete_page.fill_single_input()
         color_result = autocomplete_page.check_single_color()
         assert color == color_result
+
+
+class TestSlider:
+
+    def test_slider_controller(self, driver):
+        slider_page = SliderPage(driver, "https://demoqa.com/slider")
+        slider_page.open()
+        value_before, value_after, text_value_before, text_value_after = slider_page.change_slider_value()
+        assert value_before != value_after
+        assert text_value_before != text_value_after
+
+
+class TestProgressBar:
+
+    def test_progress_bar(self, driver):
+        progress_bar_page = ProgressBarPage(driver, "https://demoqa.com/progress-bar")
+        progress_bar_page.open()
+        value_before, value_after = progress_bar_page.change_progress_bar_value()
+        assert value_before != value_after
+
+    def test_completed_progress_bar(self, driver):
+        progress_bar_page = ProgressBarPage(driver, "https://demoqa.com/progress-bar")
+        progress_bar_page.open()
+        completed_progress_bar, reset_value = progress_bar_page.complete_progress_bar()
+        assert completed_progress_bar == '100%'
+        assert reset_value == '0%'
