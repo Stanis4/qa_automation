@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from pages.widgets_page import AccordianPage, AutocompletePage, SliderPage, ProgressBarPage
+from pages.widgets_page import AccordianPage, AutocompletePage, SliderPage, ProgressBarPage, TabsPage
 
 
 class TestAccordianPage:
@@ -75,3 +75,14 @@ class TestProgressBar:
         completed_progress_bar, reset_value = progress_bar_page.complete_progress_bar()
         assert completed_progress_bar == '100%'
         assert reset_value == '0%'
+
+
+class TestTabs:
+    @pytest.mark.parametrize('tab, expected_title', [('what', 'What'), ('origin', 'Origin'), ('use', 'Use'), ('more', 'More')])
+    def test_tabs(self, driver, tab, expected_title):
+        tabs_page = TabsPage(driver, "https://demoqa.com/tabs")
+        tabs_page.open()
+        tab_title, content_length = tabs_page.check_tabs(tab)
+        assert tab_title == expected_title
+        assert content_length > 0
+
