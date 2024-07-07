@@ -2,7 +2,7 @@ import time
 
 import pytest
 
-from pages.widgets_page import AccordianPage, AutocompletePage, SliderPage, ProgressBarPage, TabsPage
+from pages.widgets_page import AccordianPage, AutocompletePage, SliderPage, ProgressBarPage, TabsPage, TooltipsPage
 
 
 class TestAccordianPage:
@@ -86,3 +86,13 @@ class TestTabs:
         assert tab_title == expected_title
         assert content_length > 0
 
+
+class TestTooltips:
+    def test_tooltips(self, driver):
+        tooltips_page = TooltipsPage(driver, "https://demoqa.com/tool-tips")
+        tooltips_page.open()
+        tooltip_text_button, tooltip_text_field, tooltip_text_contrary, tooltip_text_number = tooltips_page.check_tooltips()
+        assert tooltip_text_button == "You hovered over the Button"
+        assert tooltip_text_field == "You hovered over the text field"
+        assert tooltip_text_contrary == "You hovered over the Contrary"
+        assert tooltip_text_number == "You hovered over the 1.10.32"
