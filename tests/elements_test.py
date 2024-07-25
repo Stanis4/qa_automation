@@ -1,13 +1,15 @@
 import random
 
+import pytest
+
 from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage, \
     UploadAndDownloadPage, DynamicPropertiesPage
 
 
+@pytest.mark.route('text-box')
 class TestTextBox:
     def test_text_box(self, driver):
-        text_box_page = TextBoxPage(driver, 'https://demoqa.com/text-box')
-        text_box_page.open()
+        text_box_page = TextBoxPage(driver)
         full_name, email, current_address, permanent_address = text_box_page.fill_all_fields()
         output_name, output_email, output_cur_addr, output_perm_addr = text_box_page.check_filled_form()
         assert full_name == output_name, 'full name not match'
@@ -16,10 +18,10 @@ class TestTextBox:
         assert permanent_address == output_perm_addr, 'permanent address not match'
 
 
+@pytest.mark.route('checkbox')
 class TestCheckBox:
     def test_check_box(self, driver):
-        check_box_page = CheckBoxPage(driver, 'https://demoqa.com/checkbox')
-        check_box_page.open()
+        check_box_page = CheckBoxPage(driver)
         check_box_page.open_full_list()
         check_box_page.click_random_checkbox()
         input_checkbox = check_box_page.get_checked_checkboxes()
@@ -27,10 +29,10 @@ class TestCheckBox:
         assert input_checkbox == output_result, 'checkboxes are not selected'
 
 
+@pytest.mark.route('radio-button')
 class TestRadioButton:
     def test_radio_button(self, driver):
-        radio_button_page = RadioButtonPage(driver, 'https://demoqa.com/radio-button')
-        radio_button_page.open()
+        radio_button_page = RadioButtonPage(driver)
         radio_button_page.click_radio_button('yes')
         output_yes = radio_button_page.get_output_result()
         radio_button_page.click_radio_button('impressive')
@@ -43,24 +45,22 @@ class TestRadioButton:
 
     # check that 'No' radiobutton is disabled
     def test_no_button_is_disabled(self, driver):
-        radio_button_page = RadioButtonPage(driver, 'https://demoqa.com/radio-button')
-        radio_button_page.open()
+        radio_button_page = RadioButtonPage(driver)
         no_button_clickable = radio_button_page.radio_button_no_status()
         assert no_button_clickable == 'No'
 
 
+@pytest.mark.route('webtables')
 class TestWebTable:
     def test_web_table_add_person(self, driver):
-        web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
-        web_table_page.open()
+        web_table_page = WebTablePage(driver)
         new_person = web_table_page.add_new_person(count=5)
         result_table = web_table_page.check_new_added_person()
         for raw in new_person:
             assert raw in result_table, "entered record has not been added to the table"
 
     def test_web_table_search_person(self, driver):
-        web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
-        web_table_page.open()
+        web_table_page = WebTablePage(driver)
         keyword = web_table_page.add_new_person(count=1)[0][random.randint(0, 5)]
         result_table = web_table_page.check_new_added_person()
         for raw in result_table:
@@ -70,8 +70,7 @@ class TestWebTable:
         assert keyword in table_result, "person was not found in the table"
 
     def test_web_table_update_person_info(self, driver):
-        web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
-        web_table_page.open()
+        web_table_page = WebTablePage(driver)
         person = web_table_page.add_new_person()
         last_name = person[0][1]
         web_table_page.search_person(last_name)
@@ -80,8 +79,7 @@ class TestWebTable:
         assert edit_random_value in row, f"value '{edit_random_value}' was not changed"
 
     def test_web_table_delete_person_info(self, driver):
-        web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
-        web_table_page.open()
+        web_table_page = WebTablePage(driver)
         person = web_table_page.add_new_person()
         email = person[0][3]
         web_table_page.search_person(email)
@@ -90,14 +88,12 @@ class TestWebTable:
         assert text == "No rows found", "Record was not deleted"
 
     def test_web_table_change_count_row(self, driver):
-        web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
-        web_table_page.open()
+        web_table_page = WebTablePage(driver)
         number_of_rows = web_table_page.select_number_of_rows()
         assert number_of_rows == [5, 10, 20, 25, 50, 100], "The number of rows was not changed"
 
     def test_web_table_switch_tables(self, driver):
-        web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
-        web_table_page.open()
+        web_table_page = WebTablePage(driver)
         number_of_rows = web_table_page.change_number_of_rows(number=5)
         assert number_of_rows == 5
 
@@ -117,10 +113,10 @@ class TestWebTable:
         assert number_of_all_rows > number_of_filled_rows
 
 
+@pytest.mark.route('buttons')
 class TestButtons:
     def test_button_click(self, driver):
-        buttons_page = ButtonsPage(driver, 'https://demoqa.com/buttons')
-        buttons_page.open()
+        buttons_page = ButtonsPage(driver)
         double_click = buttons_page.double_click()
         right_click = buttons_page.right_click()
         click = buttons_page.click()
@@ -129,16 +125,15 @@ class TestButtons:
         assert click == "You have done a dynamic click", "Dynamic click action failed"
 
 
+@pytest.mark.route('links')
 class TestLinksPage:
     def test_valid_link(self, driver):
-        links_page = LinksPage(driver, 'https://demoqa.com/links')
-        links_page.open()
+        links_page = LinksPage(driver)
         href_link, current_url = links_page.check_new_tab_simple_link()
         assert href_link == current_url, "the link is broken"
 
     def test_status_codes(self, driver):
-        links_page = LinksPage(driver, 'https://demoqa.com/links')
-        links_page.open()
+        links_page = LinksPage(driver)
         bad_link = links_page.check_link("https://demoqa.com/bad-request")
         created_link = links_page.check_link("https://demoqa.com/created")
         no_content_link = links_page.check_link("https://demoqa.com/no-content")
@@ -155,32 +150,30 @@ class TestLinksPage:
         assert not_found_link == 404
 
 
+@pytest.mark.route('upload-download')
 class TestUploadAndDownload:
 
     def test_upload_file(self, driver):
-        upload_download_page = UploadAndDownloadPage(driver, 'https://demoqa.com/upload-download')
-        upload_download_page.open()
+        upload_download_page = UploadAndDownloadPage(driver)
         file_name, result = upload_download_page.upload_file()
         assert file_name == result, "file was not uploaded"
 
     def test_download_file(self, driver):
-        upload_download_page = UploadAndDownloadPage(driver, 'https://demoqa.com/upload-download')
-        upload_download_page.open()
+        upload_download_page = UploadAndDownloadPage(driver)
         check = upload_download_page.download_file()
         assert check is True, "file was not downloaded"
 
 
+@pytest.mark.route('dynamic-properties')
 class TestDynamicProperties:
 
     def test_dynamic_properties(self, driver):
-        dynamic_properties_page = DynamicPropertiesPage(driver, 'https://demoqa.com/dynamic-properties')
-        dynamic_properties_page.open()
+        dynamic_properties_page = DynamicPropertiesPage(driver)
         color_before, color_after = dynamic_properties_page.check_changed_color()
         assert color_before != color_after, "Button color was not changed"
 
     def test_button_enable_disable(self, driver):
-        dynamic_properties_page = DynamicPropertiesPage(driver, 'https://demoqa.com/dynamic-properties')
-        dynamic_properties_page.open()
+        dynamic_properties_page = DynamicPropertiesPage(driver)
         disabled = dynamic_properties_page.check_button_is_disabled()
         enabled = dynamic_properties_page.check_button_is_enabled()
         assert disabled is True, "Disabled button is clickable"

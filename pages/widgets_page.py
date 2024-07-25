@@ -1,12 +1,14 @@
 import random
 import time
+from selenium.webdriver.support.select import Select
 
 from selenium.webdriver import Keys
 
 from generator.generator import generated_color
 from locators.widgets_page_locators import AccordianPageLocators, AutocompletePageLocators, SliderPageLocators, \
-    ProgressBarPageLocators, TabsPageLocators, TooltipsPageLocators
+    ProgressBarPageLocators, TabsPageLocators, TooltipsPageLocators, MenuPageLocators, MenuSelectPageLocators
 from pages.base_page import BasePage
+from selenium.webdriver.common.by import By
 
 
 class AccordianPage(BasePage):
@@ -106,7 +108,7 @@ class ProgressBarPage(BasePage):
     def complete_progress_bar(self):
         start_stop_button = self.element_is_visible(self.locators.START_STOP_BUTTON)
         start_stop_button.click()
-        completed_progress_bar = self.element_is_present(self.locators.PROGRESS_BAR_COMPLETED, timeout=15).text
+        completed_progress_bar = self.element_is_present(self.locators.PROGRESS_BAR_COMPLETED).text
         reset_button = self.element_is_visible(self.locators.RESET_BUTTON)
         reset_button.click()
         reset_value = self.element_is_present(self.locators.PROGRESS_BAR_VALUE).text
@@ -149,9 +151,104 @@ class TooltipsPage(BasePage):
         return tooltip_text.text
 
     def check_tooltips(self):
-        tooltip_text_button = self.get_text_from_tooltips(self.locators.HOVER_BUTTON, self.locators.HOVER_BUTTON_TOOLTIP)
+        tooltip_text_button = self.get_text_from_tooltips(self.locators.HOVER_BUTTON,
+                                                          self.locators.HOVER_BUTTON_TOOLTIP)
         tooltip_text_field = self.get_text_from_tooltips(self.locators.TEXT_FIELD, self.locators.TEXT_FIELD_TOOLTIP)
-        tooltip_text_contrary = self.get_text_from_tooltips(self.locators.CONTRARY_WORD, self.locators.CONTRARY_WORD_TOOLTIP)
+        tooltip_text_contrary = self.get_text_from_tooltips(self.locators.CONTRARY_WORD,
+                                                            self.locators.CONTRARY_WORD_TOOLTIP)
         tooltip_text_number = self.get_text_from_tooltips(self.locators.NUMBER_WORD, self.locators.NUMBER_WORD_TOOLTIP)
         return tooltip_text_button, tooltip_text_field, tooltip_text_contrary, tooltip_text_number
 
+
+class MenuPage(BasePage):
+    locators = MenuPageLocators()
+
+    def check_menu(self):
+        menu_item_list = self.elements_are_present(self.locators.MENU_ITEM_LIST)
+        data = []
+        for item in menu_item_list:
+            self.action_move_to_element(item)
+            data.append(item.text)
+        return data
+
+
+class MenuSelectPage(BasePage):
+    locators = MenuSelectPageLocators()
+
+    def check_select_value(self, key):
+        input_field = self.element_is_visible(self.locators.SELECT_VALUE_INPUT)
+        input_field.send_keys(key)
+        input_field.send_keys(Keys.ENTER)
+        text_value = self.element_is_visible(self.locators.SELECT_DROPDOWN_VALUE)
+        return text_value.text
+
+    def check_select_one_value(self, option):
+        options = {
+            'Dr.': {
+                'title': self.locators.OPTION_DR},
+            'Mr.': {
+                'title': self.locators.OPTION_MR},
+            'Mrs.': {
+                'title': self.locators.OPTION_MRS},
+            'Ms.': {
+                'title': self.locators.OPTION_MS},
+            'Prof.': {
+                'title': self.locators.OPTION_PROF},
+            'Other': {
+                'title': self.locators.OPTION_OTHER}}
+
+        input_field = self.element_is_visible(self.locators.SELECT_ONE_DROPDOWN)
+        input_field.click()
+        select_one_dropdown = self.element_is_visible(options[option]['title'])
+        select_one_dropdown.click()
+        selected_value = self.element_is_visible(self.locators.SELECT_DROPDOWN_VALUE)
+        return selected_value.text
+
+    def check_old_style_select(self, text):
+        option_field = self.element_is_visible(self.locators.OLD_STYLE_SELECT_MENU)
+        value_before = option_field.get_attribute('value')
+        option_field.click()
+        self._select_option_by_text(option_field, text)
+        value_after = option_field.get_attribute('value')
+        return value_before, value_after
+
+    def _select_option_by_text(self, element, text):
+        select = Select(element)
+        select.select_by_visible_text(text)
+
+    def insert_multiselect_values(self):
+        input_dropdown = self.element_is_visible(self.locators.MULTISELECT_DROPDOWN)
+        input_dropdown.click()
+        input_field = self.element_is_visible(self.locators.MULTISELECT_INPUT)
+        options = options_len = len(self.elements_are_present(self.locators.LIST_OF_OPTIONS))
+        while options_len >= 1:
+            input_field.send_keys(Keys.ENTER)
+            options_len -= 1
+        assert self.element_is_visible(self.locators.NO_OPTIONS)
+        num_of_added_options = len(self.elements_are_visible(self.locators.LIST_OF_ADDED_OPTIONS))
+        return options, num_of_added_options
+
+    def select_one_value_in_standard_multiselect(self):
+        random_car = random.choice(['volvo', 'saab', 'opel', 'audi'])
+        random_car_locator = (By.CSS_SELECTOR, f"select[id='cars'] option[value='{random_car}']")
+        select_box = self.element_is_visible(self.locators.STANDARD_MULTISELECT)
+        random_car_object = self.element_is_visible(random_car_locator)
+
+        background_color_before = random_car_object.value_of_css_property('background-color')
+        select_item = Select(select_box)
+        select_item.select_by_value(random_car)
+        background_color_after = random_car_object.value_of_css_property('background-color')
+        return background_color_before, background_color_after
+
+    def select_multiple_values_in_standard_multiselect(self):
+        car_list = ['volvo', 'saab', 'opel', 'audi']
+        select_box = self.element_is_visible(self.locators.STANDARD_MULTISELECT)
+        list_of_rgba = []
+        for car in car_list:
+            locator = (By.CSS_SELECTOR, f"select[id='cars'] option[value='{car}']")
+            car_object = self.element_is_visible(locator)
+            select_item = Select(select_box)
+            select_item.select_by_value(car)
+            background_color_of_item = car_object.value_of_css_property('background-color')
+            list_of_rgba.append(background_color_of_item)
+        return list_of_rgba

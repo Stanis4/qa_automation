@@ -57,3 +57,41 @@ class TooltipsPageLocators:
     NUMBER_WORD_TOOLTIP = (By.CSS_SELECTOR, 'a[aria-describedby="sectionToolTip"]')
 
     TOOLTIPS = (By.CSS_SELECTOR, 'div[class="tooltip-inner"]')
+
+
+class MenuPageLocators:
+    MENU_ITEM_LIST = (By.CSS_SELECTOR, 'ul[id="nav"] li a')
+
+
+class MenuSelectPageLocators:
+    # Select value
+    SELECT_VALUE_DROPDOWN = (By.CSS_SELECTOR, 'div[id="withOptGroup"]')
+    SELECT_VALUE_INPUT = (By.CSS_SELECTOR, 'input[id="react-select-2-input"]')
+    SELECT_DROPDOWN_VALUE = (By.CSS_SELECTOR, 'div[class=" css-1uccc91-singleValue"]')
+
+    # Select one value
+    SELECT_ONE_DROPDOWN = (By.CSS_SELECTOR, 'div[id="selectOne"]')
+    OPTION_DR = (By.CSS_SELECTOR, 'div[id="react-select-3-option-0-0"]')
+    OPTION_MR = (By.CSS_SELECTOR, 'div[id="react-select-3-option-0-1"]')
+    OPTION_MRS = (By.CSS_SELECTOR, 'div[id="react-select-3-option-0-2"]')
+    OPTION_MS = (By.CSS_SELECTOR, 'div[id="react-select-3-option-0-3"]')
+    OPTION_PROF = (By.CSS_SELECTOR, 'div[id="react-select-3-option-0-4"]')
+    OPTION_OTHER = (By.CSS_SELECTOR, 'div[id="react-select-3-option-0-5"]')
+
+    # old style select
+    OLD_STYLE_SELECT_MENU = (By.CSS_SELECTOR, 'select[id="oldSelectMenu"]')
+
+    # multi select drop down
+    MULTISELECT_DROPDOWN = (By.XPATH, "(//div[@class=' css-yk16xz-control'])[3]")
+    MULTISELECT_INPUT = (By.CSS_SELECTOR, 'input[id="react-select-4-input"]')
+    MULTISELECT_INPUT_LIST = (By.XPATH, "//div[@class=' css-11unzgr']/*")
+    CLEAR_BUTTON = (By.CSS_SELECTOR, "svg[class='css-19bqh2r']")
+    NO_OPTIONS = (By.CSS_SELECTOR, "div[class=' css-1gl4k7y']")
+    LIST_OF_OPTIONS = (By.XPATH, "//div[@class=' css-11unzgr']/*")
+    LIST_OF_ADDED_OPTIONS = (By.CSS_SELECTOR, "div[class ='css-1rhbuit-multiValue']")
+
+
+    # standard select
+    STANDARD_MULTISELECT = (By.CSS_SELECTOR, 'select[id="cars"]')
+
+

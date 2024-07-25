@@ -5,34 +5,51 @@ from selenium.webdriver.support import expected_conditions as EC
 
 
 class BasePage:
-    def __init__(self, driver, url):
-        self.driver = driver
-        self.url = url
+    def __init__(self, driver):
+        self.__driver = driver
 
-    def open(self):
-        self.driver.get(self.url)
+    @property
+    def driver(self):
+        return self.__driver
 
-    def element_is_visible(self, locator, timeout=5):
+    @property
+    def action_chains(self):
+        return ActionChains(driver=self.driver)
+
+    def wait_until(self, locator, condition, *, timeout=10):
+        return wait(self.driver, timeout).until(condition(locator))
+
+    def wait_until_not(self, locator, condition, *, timeout=10):
+        return wait(self.driver, timeout).until(condition(locator))
+
+    def element_is_visible(self, locator):
         self.go_to_element(self.element_is_present(locator))
-        return wait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
+        condition = EC.visibility_of_element_located
+        return self.wait_until(locator, condition)
 
-    def elements_are_visible(self, locator, timeout=5):
-        return wait(self.driver, timeout).until(EC.visibility_of_all_elements_located(locator))
+    def elements_are_visible(self, locator):
+        condition = EC.visibility_of_all_elements_located
+        return self.wait_until(locator, condition)
 
-    def element_is_present(self, locator, timeout=5):
-        return wait(self.driver, timeout).until(EC.presence_of_element_located(locator))
+    def element_is_present(self, locator):
+        condition = EC.presence_of_element_located
+        return self.wait_until(locator, condition)
 
-    def elements_are_present(self, locator, timeout=5):
-        return wait(self.driver, timeout).until(EC.presence_of_all_elements_located(locator))
+    def elements_are_present(self, locator):
+        condition = EC.presence_of_all_elements_located
+        return self.wait_until(locator, condition)
 
-    def elements_are_not_present(self, locator, timeout=5):
-        return wait(self.driver, timeout).until_not(EC.presence_of_all_elements_located(locator))
+    def elements_are_not_present(self, locator):
+        condition = EC.presence_of_all_elements_located
+        return self.wait_until_not(locator, condition)
 
-    def element_is_not_visible(self, locator, timeout=5):
-        return wait(self.driver, timeout).until(EC.invisibility_of_element_located(locator))
+    def element_is_not_visible(self, locator):
+        condition = EC.invisibility_of_element_located
+        return self.wait_until(locator, condition)
 
-    def element_is_clickable(self, locator, timeout=5):
-        return wait(self.driver, timeout).until(EC.element_to_be_clickable(locator))
+    def element_is_clickable(self, locator):
+        condition = EC.element_to_be_clickable
+        return self.wait_until(locator, condition)
 
     def go_to_element(self, element):
         self.driver.execute_script("arguments[0].scrollIntoView();", element)
@@ -54,7 +71,13 @@ class BasePage:
 
     def action_move_to_element(self, element):
         action = ActionChains(self.driver)
+        self.go_to_element(element)
         action.move_to_element(element)
+        action.perform()
+
+    def drag_and_drop_to_element(self, what, where):
+        action = ActionChains(self.driver)
+        action.drag_and_drop(what, where)
         action.perform()
 
     def remove_footer(self):
