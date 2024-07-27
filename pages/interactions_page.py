@@ -1,6 +1,6 @@
 import random
 
-from locators.interactions_page_locators import SortablePageLocators, SelectablePageLocators
+from locators.interactions_page_locators import SortablePageLocators, SelectablePageLocators, ResizablePageLocators
 from pages.base_page import BasePage
 
 
@@ -53,5 +53,41 @@ class SelectablePage(BasePage):
         item_list_active = self.elements_are_visible(tabs[tab]['active_list'])
 
         return len(item_list), len(item_list_active)
+
+
+class ResizablePage(BasePage):
+    locators = ResizablePageLocators()
+
+
+    def get_pixels_from_width_height(self, size_value):
+        width = size_value.split(';')[0].split(':')[1].replace(' ', '')
+        height = size_value.split(';')[1].split(':')[1].replace(' ', '')
+        return width, height
+
+    def get_min_max_size(self, element):
+        size = self.element_is_present(element)
+        size_value = size.get_attribute('style')
+        return size_value
+
+    def change_size_resizable_box(self):
+        default_size = self.get_pixels_from_width_height(self.get_min_max_size(self.locators.RESIZABLE_BOX))
+
+        self.action_drag_and_drop_by_offset(self.element_is_visible(self.locators.RESIZABLE_BOX_HANDLE), -50, -50)
+        min_size = self.get_pixels_from_width_height(self.get_min_max_size(self.locators.RESIZABLE_BOX))
+
+        self.action_drag_and_drop_by_offset(self.element_is_visible(self.locators.RESIZABLE_BOX_HANDLE), 400, 200)
+        max_size = self.get_pixels_from_width_height(self.get_min_max_size(self.locators.RESIZABLE_BOX))
+        return default_size, min_size, max_size
+
+    def change_size_resizable(self):
+        self.action_drag_and_drop_by_offset(self.element_is_visible(self.locators.RESIZABLE_HANDLE), 100, 100)
+        max_size = self.get_pixels_from_width_height(self.get_min_max_size(self.locators.RESIZABLE))
+
+        self.action_drag_and_drop_by_offset(self.element_is_visible(self.locators.RESIZABLE_HANDLE), -200, -200)
+        min_size = self.get_pixels_from_width_height(self.get_min_max_size(self.locators.RESIZABLE))
+        return min_size, max_size
+
+
+
 
 
