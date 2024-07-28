@@ -1,6 +1,6 @@
 import pytest
 
-from pages.interactions_page import SortablePage, SelectablePage, ResizablePage
+from pages.interactions_page import SortablePage, SelectablePage, ResizablePage, DroppablePage
 
 
 @pytest.mark.route('sortable')
@@ -43,5 +43,33 @@ class TestResizablePage:
         print(max_size)
 
 
+@pytest.mark.route('droppable')
+class TestDroppablePage:
+    def test_simple_drop(self, driver):
+        droppable_page = DroppablePage(driver)
+        text_before_drop, text_after_drop = droppable_page.simple_drag_and_drop()
+        assert text_before_drop == "Drop here"
+        assert text_after_drop == "Dropped!"
 
+    def test_accept_drop(self, driver):
+        droppable_page = DroppablePage(driver)
+        drop_element_text_with_no_accept, drop_element_text_with_accept = droppable_page.simple_drag_and_drop()
+        assert drop_element_text_with_no_accept == "Drop here"
+        assert drop_element_text_with_accept == "Dropped!"
 
+    def test_prevent_drop(self, driver):
+        droppable_page = DroppablePage(driver)
+        not_greedy_outer, not_greedy_inner, greedy_outer, greedy_inner  = droppable_page.drop_prevent_propogation()
+        assert not_greedy_outer == "Dropped!"
+        assert not_greedy_inner == "Dropped!"
+        assert greedy_outer == "Outer droppable"
+        assert greedy_inner == "Dropped!"
+
+    @pytest.mark.parametrize('drag_type', [('will_revert'), ('not_revert')])
+    def test_revert_drop(self, driver, drag_type):
+        droppable_page = DroppablePage(driver)
+        position_after_move, position_after_revert = droppable_page.drop_with_revert_drop(drag_type)
+        if drag_type == 'will_revert':
+            assert position_after_move != position_after_revert
+        elif drag_type == 'not_revert':
+            assert position_after_move == position_after_revert
