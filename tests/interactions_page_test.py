@@ -1,6 +1,6 @@
 import pytest
 
-from pages.interactions_page import SortablePage, SelectablePage, ResizablePage, DroppablePage
+from pages.interactions_page import SortablePage, SelectablePage, ResizablePage, DroppablePage, DragablePage
 
 
 @pytest.mark.route('sortable')
@@ -59,7 +59,7 @@ class TestDroppablePage:
 
     def test_prevent_drop(self, driver):
         droppable_page = DroppablePage(driver)
-        not_greedy_outer, not_greedy_inner, greedy_outer, greedy_inner  = droppable_page.drop_prevent_propogation()
+        not_greedy_outer, not_greedy_inner, greedy_outer, greedy_inner = droppable_page.drop_prevent_propogation()
         assert not_greedy_outer == "Dropped!"
         assert not_greedy_inner == "Dropped!"
         assert greedy_outer == "Outer droppable"
@@ -73,3 +73,22 @@ class TestDroppablePage:
             assert position_after_move != position_after_revert
         elif drag_type == 'not_revert':
             assert position_after_move == position_after_revert
+
+
+@pytest.mark.route('dragabble')
+class TestDragablePage:
+    def test_simple_drag(self, driver):
+        dragable_page = DragablePage(driver)
+        before_position, after_position = dragable_page.simple_drag()
+        assert before_position != after_position
+
+    @pytest.mark.parametrize('drag_item', [('x'),('y')])
+    def test_axis_restriction_drop(self, driver, drag_item):
+        dragable_page = DragablePage(driver)
+        top_item, left_item = dragable_page.axis_restricted(drag_item)
+        if drag_item == 'x':
+            assert top_item[0] == top_item[1]
+            assert left_item[0] != left_item[1]
+        elif drag_item == 'y':
+            assert top_item[0] != top_item[1]
+            assert left_item[0] == left_item[1]

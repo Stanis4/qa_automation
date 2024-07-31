@@ -1,8 +1,9 @@
 import random
 import time
+import re
 
 from locators.interactions_page_locators import SortablePageLocators, SelectablePageLocators, ResizablePageLocators, \
-    DroppablePageLocators
+    DroppablePageLocators, DragablePageLocators
 from pages.base_page import BasePage
 
 
@@ -145,3 +146,41 @@ class DroppablePage(BasePage):
         time.sleep(1)
         position_after_revert = revert.get_attribute('style')
         return position_after_move, position_after_revert
+
+
+class DragablePage(BasePage):
+    locators = DragablePageLocators()
+
+    def _get_element_position_before_after(self, element):
+        self.action_drag_and_drop_by_offset(element, random.randint(1, 20), random.randint(1, 20))
+        position_before = element.get_attribute('style')
+
+        self.action_drag_and_drop_by_offset(element, random.randint(1, 20), random.randint(1, 20))
+        position_after = element.get_attribute('style')
+        return position_before, position_after
+
+    def simple_drag(self):
+        self.element_is_visible(self.locators.SIMPLE_TAB).click()
+        drag_element = self.element_is_visible(self.locators.DRAG_ME)
+        before_position, after_position = self._get_element_position_before_after(drag_element)
+        return before_position, after_position
+
+    def _get_top_position(self, element):
+        return re.findall(r'top:\s*(\d+)px;', element)
+
+    def _get_left_position(self, element):
+        return re.findall(r'left:\s*(\d+)px;', element)
+
+    def axis_restricted(self, element):
+        elements = {
+            'x': {'title': self.locators.ONLY_X},
+            'y': {'title': self.locators.ONLY_Y}
+        }
+        self.element_is_visible(self.locators.AXIS_TAB).click()
+        drag_item = self.element_is_visible(elements[element]['title'])
+        position_x = self._get_element_position_before_after(drag_item)
+        top_item_before = self._get_top_position(position_x[0])
+        top_item_after = self._get_top_position(position_x[1])
+        left_item_before = self._get_left_position(position_x[0])
+        left_item_after = self._get_left_position(position_x[1])
+        return [top_item_before, top_item_after], [left_item_before, left_item_after]
