@@ -9,3 +9,4 @@ file = os.getenv('ENV_FILE', path_to_config)
 
 browser = BrowserConfig(_env_file=file)
 
+os.getenv('CHROME')
