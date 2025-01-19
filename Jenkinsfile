@@ -23,7 +23,7 @@ pipeline{
     environment{
         PLATFORM = 'CHROME'
         BROWSER_VERSION = 132
-        ENV_FILE = credentials(config_file)
+        ENV_FILE = credentials(config_file.toString())
     }
 
     stages{
